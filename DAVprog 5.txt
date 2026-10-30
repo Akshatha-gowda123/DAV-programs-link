@@ -1,0 +1,23 @@
+import pandas as pd
+df=pd.read_csv('students.csv')
+Q1=df['StudyHours'].quantile(0.25)
+Q3=df['StudyHours'].quantile(0.75)
+IQR=Q3-Q1
+lower=Q3-1.5*IQR
+upper=Q3+1.5*IQR
+outliers_iqr=df[(df['StudyHours']<lower)|(df['StudyHours']>upper)]
+print(f'IQR BOUNDS:[{lower:2f},{upper:.2f}]')
+print("Outliers found(IQR)",len(outliers_iqr))
+df['Z_score']=(df['StudyHours']-df['StudyHours'].mean())/df['StudyHours'].std()
+outliers_z=df[df['Z_score'].abs()>3]
+print('outliers found(Z_score>3):',len(outliers_z))
+df['StudyHours_Capped']=df['StudyHours'].clip(lower=lower,upper=upper)
+print('Before:',df['StudyHours'].max())
+print('After:',df['StudyHours_Capped'].max())
+
+
+output:IQR BOUNDS:[2.507500,11.43]
+Outliers found(IQR) 21
+outliers found(Z_score>3): 1
+Before: 13.98
+After: 11.4325
